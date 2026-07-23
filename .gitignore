@@ -1,0 +1,34 @@
+# Virtual environment
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Private assessment/history data
+records/*
+!records/.gitkeep
+
+# Generated reports
+reports/*
+!reports/.gitkeep
+
+# IDE / OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Environment variables / secrets
+.env
+.env.*
+*.key
+
+# Temporary files
+*.tmp
+*.log
+find_low_risk.py

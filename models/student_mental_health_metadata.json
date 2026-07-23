@@ -1,0 +1,25 @@
+{
+    "project_name": "Student Mental Health Assessment Agent",
+    "best_model": "Logistic Regression",
+    "input_features": [
+        "gender",
+        "age",
+        "course",
+        "study_year",
+        "cgpa",
+        "marital_status"
+    ],
+    "target": "mental_health_concern",
+    "class_names": {
+        "0": "No Reported Concern",
+        "1": "Concern Reported"
+    },
+    "test_accuracy": 0.6153846153846154,
+    "test_precision": 0.6875,
+    "test_recall": 0.6875,
+    "test_f1_score": 0.6875,
+    "test_roc_auc": 0.684375,
+    "cross_validation_accuracy": 0.5942857142857143,
+    "cross_validation_f1": 0.6315135418715981,
+    "disclaimer": "This model provides a preliminary educational wellness screening result and is not a medical diagnosis."
+}
