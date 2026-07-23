@@ -101,14 +101,6 @@ STUDY_YEAR_OPTIONS = [
     "Year 4",
 ]
 
-CGPA_OPTIONS = [
-    "0 - 1.99",
-    "2.00 - 2.49",
-    "2.50 - 2.99",
-    "3.00 - 3.49",
-    "3.50 - 4.00",
-]
-
 MARITAL_STATUS_OPTIONS = [
     "Not Married",
     "Married",
@@ -161,7 +153,37 @@ except Exception as error:
 
 
 # ============================================================
-# 5. PREPARE MODEL INPUT
+# 5. CGPA CONVERSION
+# ============================================================
+
+def convert_cgpa_to_model_band(
+    cgpa_10_point: float,
+) -> str:
+    """
+    Convert a user-friendly 10-point CGPA value into the
+    categorical 4-point-style range expected by the trained model.
+
+    This is an approximate normalization for model compatibility,
+    not an official university CGPA conversion.
+    """
+
+    if cgpa_10_point < 5.0:
+        return "0 - 1.99"
+
+    if cgpa_10_point < 6.25:
+        return "2.00 - 2.49"
+
+    if cgpa_10_point < 7.50:
+        return "2.50 - 2.99"
+
+    if cgpa_10_point < 8.75:
+        return "3.00 - 3.49"
+
+    return "3.50 - 4.00"
+
+
+# ============================================================
+# 6. PREPARE MODEL INPUT
 # ============================================================
 
 def prepare_model_input(
@@ -169,7 +191,7 @@ def prepare_model_input(
     age,
     course,
     study_year,
-    cgpa,
+    model_cgpa,
     marital_status,
 ):
 
@@ -186,7 +208,7 @@ def prepare_model_input(
                 "age": int(age),
                 "course": course,
                 "study_year": study_year,
-                "cgpa": cgpa,
+                "cgpa": model_cgpa,
                 "marital_status": model_marital_status,
             }
         ],
@@ -202,7 +224,7 @@ def prepare_model_input(
 
 
 # ============================================================
-# 6. MODEL PREDICTION
+# 7. MODEL PREDICTION
 # ============================================================
 
 def predict_risk(
@@ -261,7 +283,7 @@ def predict_risk(
 
 
 # ============================================================
-# 7. RISK CATEGORY
+# 8. RISK CATEGORY
 # ============================================================
 
 def get_risk_category(
@@ -278,7 +300,7 @@ def get_risk_category(
 
 
 # ============================================================
-# 8. WELLNESS SCORE
+# 9. WELLNESS SCORE
 # ============================================================
 
 def calculate_wellness_score(
@@ -358,7 +380,7 @@ def calculate_wellness_score(
         score -= 6
 
 
-    # Self-reported concerns
+    # Reported concerns
     if anxiety:
 
         score -= 8
@@ -410,7 +432,7 @@ def calculate_wellness_score(
 
 
 # ============================================================
-# 9. WELLNESS GRADE
+# 10. WELLNESS GRADE
 # ============================================================
 
 def get_wellness_grade(
@@ -418,22 +440,19 @@ def get_wellness_grade(
 ):
 
     if score >= 80:
-
         return "Excellent"
 
     if score >= 65:
-
         return "Good"
 
     if score >= 50:
-
         return "Needs Attention"
 
     return "Needs Support"
 
 
 # ============================================================
-# 10. MENTAL BATTERY
+# 11. MENTAL BATTERY
 # ============================================================
 
 def get_mental_battery(
@@ -464,7 +483,7 @@ def get_mental_battery(
 
 
 # ============================================================
-# 11. SAVE ASSESSMENT
+# 12. SAVE ASSESSMENT
 # ============================================================
 
 def save_assessment(
@@ -504,7 +523,6 @@ def save_assessment(
     ).reindex(
         columns=columns
     )
-
 
     if HISTORY_PATH.exists():
 
@@ -560,7 +578,7 @@ def save_assessment(
 
 
 # ============================================================
-# 12. PAGE HEADER
+# 13. PAGE HEADER
 # ============================================================
 
 st.title(
@@ -581,20 +599,25 @@ with st.container(
         """
         **This assessment has two separate parts:**
 
-        🤖 **ML Prediction** uses only:
+        🤖 **ML Prediction** uses:
         Gender, Age, Course, Study Year, CGPA and Marital Status.
 
         🌱 **Wellness Assessment** uses:
         Sleep, Study Hours, Stress, Social Support, Physical Activity,
         Screen Time, Reported Concerns and Mood.
 
-        These two results may be different because they measure different things.
+        CGPA can be entered normally on a **10-point scale**.
+        The application automatically converts it internally into the
+        category format required by the trained ML model.
+
+        ML prediction and Wellness Score may be different because
+        they measure different aspects.
         """
     )
 
 
 # ============================================================
-# 13. ASSESSMENT FORM
+# 14. ASSESSMENT FORM
 # ============================================================
 
 with st.form(
@@ -615,7 +638,7 @@ with st.form(
         )
 
         st.caption(
-            "These six details are used directly by the trained machine-learning model."
+            "These six profile details are used by the trained machine-learning model."
         )
 
         col1, col2, col3 = st.columns(
@@ -656,16 +679,36 @@ with st.form(
 
         with col3:
 
-            cgpa = st.selectbox(
-                "CGPA Range",
-                CGPA_OPTIONS,
-                index=3,
+            cgpa_10_point = st.number_input(
+                "CGPA (out of 10)",
+                min_value=0.0,
+                max_value=10.0,
+                value=8.0,
+                step=0.1,
+                format="%.2f",
+                help=(
+                    "Enter your current CGPA on a 10-point scale. "
+                    "The app will automatically convert it internally "
+                    "into the category format required by the trained model."
+                ),
             )
 
             marital_status = st.selectbox(
                 "Marital Status",
                 MARITAL_STATUS_OPTIONS,
             )
+
+
+        model_cgpa_preview = (
+            convert_cgpa_to_model_band(
+                cgpa_10_point
+            )
+        )
+
+        st.caption(
+            f"ℹ️ Your entered CGPA: **{cgpa_10_point:.2f}/10**. "
+            "A compatible internal category will be used by the ML model."
+        )
 
 
     # ========================================================
@@ -822,7 +865,7 @@ with st.form(
         )
 
         st.caption(
-            "Your result will be saved and displayed on the separate Result page."
+            "Your result will be saved and displayed on the Result page."
         )
 
         submitted = st.form_submit_button(
@@ -832,10 +875,21 @@ with st.form(
 
 
 # ============================================================
-# 14. PROCESS ASSESSMENT
+# 15. PROCESS ASSESSMENT
 # ============================================================
 
 if submitted:
+
+
+    # --------------------------------------------------------
+    # CONVERT USER CGPA FOR MODEL
+    # --------------------------------------------------------
+
+    model_cgpa = (
+        convert_cgpa_to_model_band(
+            cgpa_10_point
+        )
+    )
 
 
     # --------------------------------------------------------
@@ -847,7 +901,7 @@ if submitted:
         age,
         course,
         study_year,
-        cgpa,
+        model_cgpa,
         marital_status,
     )
 
@@ -957,8 +1011,9 @@ if submitted:
         "study_year":
             study_year,
 
+        # User-friendly value shown on Result page
         "cgpa":
-            cgpa,
+            f"{cgpa_10_point:.2f} / 10",
 
         "marital_status":
             marital_status,
@@ -1069,7 +1124,7 @@ if submitted:
 
 
     # --------------------------------------------------------
-    # SAVE LATEST RESULT IN SESSION
+    # SAVE LATEST RESULT
     # --------------------------------------------------------
 
     st.session_state[
@@ -1078,7 +1133,7 @@ if submitted:
 
 
     # --------------------------------------------------------
-    # SUCCESS MESSAGE
+    # SUCCESS
     # --------------------------------------------------------
 
     with st.container(
@@ -1087,6 +1142,10 @@ if submitted:
 
         st.success(
             "✅ Assessment generated and saved successfully."
+        )
+
+        st.write(
+            f"Entered CGPA: **{cgpa_10_point:.2f}/10**"
         )
 
         st.write(
@@ -1102,7 +1161,7 @@ if submitted:
 
 
 # ============================================================
-# 15. FOOTER
+# 16. FOOTER
 # ============================================================
 
 st.caption(
