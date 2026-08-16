@@ -137,3 +137,19 @@ Student_Mental_Health_Agent/
     ├── game_data.py
     ├── report_generator.py
     └── styles.py
+    ```
+    ---
+
+## 📸 Application Screenshots
+
+### 🧠 ML Prediction & Wellness Assessment
+
+![Mental Health Prediction](screenshots/prediction.png)
+
+### 🌱 Personalized Recommendations & 7-Day Wellness Plan
+
+![Personalized Recommendations](screenshots/recommendations.png)
+
+### 🕘 Assessment History
+
+![Assessment History](screenshots/history.png)
