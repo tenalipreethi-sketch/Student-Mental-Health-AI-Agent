@@ -7,6 +7,11 @@ MindCare AI is a student-focused mental wellness platform that combines machine 
 The system helps students understand their current mental-wellness risk, review lifestyle patterns, track assessment history, explore analytics, and interact with a friendly companion for relaxation, games, riddles, and casual support.
 
 ---
+## 🚀 Live Application
+
+👉 [Open MindCare AI](https://mindcare-student-ai.streamlit.app/)
+
+---
 
 ## ✨ Key Features
 
