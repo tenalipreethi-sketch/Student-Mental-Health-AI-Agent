@@ -137,7 +137,7 @@ Student_Mental_Health_Agent/
     ├── game_data.py
     ├── report_generator.py
     └── styles.py
-    ---
+---
 ## 📸 Application Screenshots
 
 ### 🧠 ML Prediction & Wellness Assessment
